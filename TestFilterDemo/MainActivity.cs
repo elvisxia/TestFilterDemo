@@ -18,6 +18,7 @@ namespace TestFilterDemo
         private Dictionary<string, List<string>> Mapout = new Dictionary<string, List<string>>();
         private ExpandableListViewAdapter mAdapter;
         ExpandableListView exListview;
+        EditText etQuery;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -27,9 +28,16 @@ namespace TestFilterDemo
             
             btnFilter = FindViewById<Button>(Resource.Id.btnFilter);
             exListview = FindViewById<ExpandableListView>(Resource.Id.Exlistview);
+            etQuery = FindViewById<EditText>(Resource.Id.etQuery);
+            etQuery.TextChanged += EtQuery_TextChanged;
             SetData(out mAdapter);
             exListview.SetAdapter(mAdapter);
             btnFilter.Click += BtnFilter_Click;
+        }
+
+        private void EtQuery_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            mAdapter.Filter.InvokeFilter(e.Text.ToString());
         }
 
         private void BtnFilter_Click(object sender, EventArgs e)

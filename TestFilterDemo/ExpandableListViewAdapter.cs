@@ -18,12 +18,14 @@ namespace TestFilterDemo
         private Context context;
         private List<string> listGroup;
         private Dictionary<string, List<string>> listChild;
+        private GroupFilter _filter;
 
         public ExpandableListViewAdapter(Context context, List<string> listGroup, Dictionary<string, List<string>> listChild)
         {
             this.context = context;
             this.listGroup = listGroup;
             this.listChild = listChild;
+            _filter = new GroupFilter(this);
         }
         public override int GroupCount
         {
@@ -41,7 +43,7 @@ namespace TestFilterDemo
             }
         }
 
-        public Filter Filter => new GroupFilter(this);
+        public Filter Filter => _filter;
 
         public override Java.Lang.Object GetChild(int groupPosition, int childPosition)
         {
@@ -107,16 +109,20 @@ namespace TestFilterDemo
         private class GroupFilter : Filter
         {
             ExpandableListViewAdapter _adapter;
+            List<string> _originalList;
             public GroupFilter(ExpandableListViewAdapter adapter)
             {
                 _adapter = adapter;
+                _originalList = new List<string>(adapter.listGroup);
             }
 
             protected override FilterResults PerformFiltering(ICharSequence constraint)
             {
                 var returnObject = new FilterResults();
                 
-                var tmpList=_adapter.listGroup.Where(g => g.ToLower().Contains(constraint.ToString().ToLower()));
+                //var tmpList= _originalList.Where(g => g.ToLower().Contains(constraint.ToString().ToLower()));
+                //use LinQ to generate the filter result 
+                var tmpList = from o in _originalList where o.ToLower().Contains(constraint.ToString().ToLower()) select o;
 
                 returnObject.Values = FromArray(tmpList.ToArray());
                 returnObject.Count = tmpList.Count();
